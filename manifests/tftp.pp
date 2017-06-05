@@ -51,7 +51,18 @@ class foreman_proxy::tftp (
     }
     'Debian': {
       $grub_type = 'debian'
-      $grub_packages = ['grub-common','grub-efi-amd64-bin']
+      case $::architecture {
+        'amd64': {
+          $grub_packages = ['grub-common','grub-efi-amd64-bin']
+        }
+        'armhf': {
+          $grub_packages = ['grub-common','grub-efi-armhf-bin']
+        }
+        default: {
+          warning("Unable to detect EFI loader for architecture '${::architecture}'")
+          $grub_packages = []
+        }
+      }
       # taken from https://anonscm.debian.org/cgit/pkg-grub/grub.git/tree/debian/build-efi-images + regexp
       $grub_modules = 'all_video boot btrfs cat chain configfile echo efifwsetup efinet ext2 fat font gettext gfxmenu gfxterm gfxterm_background gzio halt hfsplus iso9660 jpeg keystatus loadenv linux lsefi lsefimmap lsefisystab lssal memdisk minicmd normal part_apple part_msdos part_gpt password_pbkdf2 png reboot search search_fs_uuid search_fs_file search_label sleep test true video zfs zfscrypt zfsinfo linuxefi lvm mdraid09 mdraid1x raid5rec raid6rec tftp regexp'
     }
